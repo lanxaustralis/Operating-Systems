@@ -28,6 +28,7 @@ int main(void)
   pid_t child;            		/* process id of the child process */
   int status;           		/* result from execv system call*/
   int shouldrun = 1;
+  char* PATH = "/bin/";
 	
   int i, upper;
 		
@@ -46,13 +47,24 @@ int main(void)
 	(2) the child process will invoke execv()
 	(3) if command included &, parent will invoke wait()
        */
+	
+	if(strcmp(args[0],"cd")==0){		
+	if(args[1]==NULL)
+		printf("User must enter at least one valid directory\n");
+	else if (chdir(args[1]) ==-1) // Shall directory ~ work as expected?
+		printf("%s is not a valid directory\n",args[1]);	
+	
+	}else{
+	char fullPath[50];
+	strcpy(fullPath, PATH);
+	strcat(fullPath,args[0]);
 	child = fork();
-	if(child==0){
-	execv("/bin/ls",args);
+	if(child==0){	
+	execv(fullPath,args);
 	perror("execv");}
 	else if(background)
 	wait(NULL);
-	
+	}
     }
   }
   return 0;
@@ -158,7 +170,7 @@ int parseCommand(char inputBuffer[], char *args[],int *background)
 } /* end of parseCommand routine */
 
 void truncFile(char *fileName){
-File *file = fopen(fileName,"w");
+FILE *file = fopen(fileName,"w");
 
 if(file == NULL){
 printf("Unable to create the file named %s\n",fileName);
@@ -166,12 +178,12 @@ exit(EXIT_FAILURE);}
 
 // Do some operations here
 // Use fputs
-fclose(fPtr);
+fclose(file);
 }
 
 
 void appendFile(char *fileName){
-File *file = fopen(fileName,"a");
+FILE *file = fopen(fileName,"a");
 
 if(file == NULL){
 printf("Unable to append the file named %s\n",fileName);
@@ -179,7 +191,7 @@ exit(EXIT_FAILURE);}
 
 // Do some operations here
 // for appending use fputs
-fclose(fPtr);
+fclose(file);
 }
 
 
